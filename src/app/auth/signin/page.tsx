@@ -173,7 +173,7 @@ const SignIn: React.FC = () => {
                 Sign In to TailAdmin
               </h2>
 
-              <form>
+              <form className="w-50" onSubmit={formik.handleSubmit}>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
@@ -181,10 +181,16 @@ const SignIn: React.FC = () => {
                   <div className="relative">
                     <input
                       type="email"
+                      name="email"
                       placeholder="Enter your email"
+                      value={formik.values.email}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
-
+                      {formik.errors.email && (
+                              <div className="text-danger">{formik.errors.email}</div>
+                            )}
                     <span className="absolute right-4 top-4">
                       <svg
                         className="fill-current"
@@ -212,10 +218,15 @@ const SignIn: React.FC = () => {
                   <div className="relative">
                     <input
                       type="password"
+                      value={formik.values.password}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       placeholder="6+ Characters, 1 Capital letter"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
-
+                  {formik.errors.password && (
+                                                <div className="text-danger">{formik.errors.password}</div>
+                                              )}
                     <span className="absolute right-4 top-4">
                       <svg
                         className="fill-current"

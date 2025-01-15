@@ -13,6 +13,12 @@ const leadSchema = new mongoose.Schema({
     enum: ['Website', 'Referral', 'Event', 'Other'],
     required: true,
   },
+  Subject: {
+    type: String
+  },
+  Description: {
+    type: String
+  },
   ContactInformation: {
     Name: { type: String, required: true },
     Phone: { type: String },
@@ -39,11 +45,12 @@ const leadSchema = new mongoose.Schema({
     required: true,
   },
   AssignedTo: {
-    type: String, 
+    type: String,
+    default: 'admin'
   },
 }, {
   timestamps: true,
 });
 
-const Lead = mongoose.model('Lead', leadSchema);
-export default Lead;
+const lead = mongoose.model('Lead', leadSchema);
+export default mongoose.models.Lead || lead;

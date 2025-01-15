@@ -7,7 +7,7 @@ const user = process.env.DB_USER;
 const password = process.env.DB_PASSWORD;
 const uri = `mongodb+srv://`+user+`:${encodeURIComponent(password)}@`+host+`/?retryWrites=true&w=majority&appName=Cluster0`;
 
-const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
+const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true }, maxPoolSize : 5, minPoolSize : 1 };
 
 const connectMongo = async () => {
   try {

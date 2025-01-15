@@ -2,13 +2,11 @@ import { NextResponse } from 'next/server';
 import connectMongo from '../utils/connectMongo'; 
 import Lead from '../model/leadModel';
 import config from '../config/auth.config'; 
-
+await connectMongo();
 // POST: Create a new lead
 export async function POST(req) {
   if (req.method === 'POST') {
     try {
-      await connectMongo();
-
       // Verify the token
       let token = req.headers.get("authorization");
       if (!token) {
@@ -23,6 +21,8 @@ export async function POST(req) {
       // Create a new lead
       const newLead = new Lead({
         Source: body.Source,
+        Description: body.Description,
+        Subject: body.Subject,
         ContactInformation: {
           Name: body.ContactInformation.Name,
           Phone: body.ContactInformation.Phone,
@@ -63,9 +63,6 @@ export async function PUT(req) {
       if (!LeadID) {
         return NextResponse.json({ message: "LeadID not provided!" }, { status: 400 });
       }
-
-      await connectMongo();
-
       // Verify the token
       let token = req.headers.get("authorization");
       if (!token) {
@@ -120,11 +117,9 @@ export async function PUT(req) {
 export async function GET(req) {
   const url = new URL(req.url);
   const LeadID = url.searchParams.get("LeadID");
-
+  const AssignedTo = url.searchParams.get("AssignedTo");
   if (req.method === 'GET') {
     try {
-      await connectMongo();
-
       // Verify the token
       let token = req.headers.get("authorization");
       if (!token) {
@@ -137,7 +132,12 @@ export async function GET(req) {
       if (LeadID) {
         // Fetch a specific lead
         result = await Lead.findOne({ LeadID });
-      } else {
+      } 
+      if (AssignedTo) {
+        // Fetch a specific lead
+        result = await Lead.find({ "AssignedTo" : AssignedTo });
+      }
+      else {
         // Fetch all leads
         result = await Lead.find();
       }
@@ -166,9 +166,6 @@ export async function DELETE(req) {
       if (!LeadID) {
         return NextResponse.json({ message: "LeadID not provided!" }, { status: 400 });
       }
-
-      await connectMongo();
-
       // Verify the token
       let token = req.headers.get("authorization");
       if (!token) {
