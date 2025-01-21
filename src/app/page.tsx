@@ -2,14 +2,15 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-
+import 'react-toastify/dist/ReactToastify.css';
 import { Metadata } from "next";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useState } from 'react';
 import axios from "axios";
 import { useRouter } from 'next/navigation'
-
+import { ToastContainer } from 'react-toastify';
+import ToastComponent from "@/components/ToastComponent";
 const SignIn: React.FC = () => {
   const router = useRouter()
   const formik = useFormik({
@@ -18,15 +19,18 @@ const SignIn: React.FC = () => {
       password: ''
     },
     onSubmit: (formData) => {
-      
+
       try {
-        axios.post(  "/api/user", { email: formData.email, password: formData.password })
+        axios.post("/api/user", { email: formData.email, password: formData.password })
           .then(result => {
-            if (result && result.request.status === 200) {
+            if (result && result.data.status === 200) {
               localStorage.setItem("accessToken", result.data.data.accessToken)
               localStorage.setItem('username', result.data.data.email);
               localStorage.setItem('loginStatus', 'true');
+              ToastComponent(result.data.data.message);
               router.push('/profile')
+            } else {
+              ToastComponent(result.data.message);
             }
           })
       } catch (e) {
@@ -42,7 +46,8 @@ const SignIn: React.FC = () => {
   });
 
   return (
-   
+    <>
+    <ToastContainer />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
@@ -201,7 +206,7 @@ const SignIn: React.FC = () => {
                 Sign In to TailAdmin
               </h2>
 
-              <form  onSubmit={formik.handleSubmit}>
+              <form onSubmit={formik.handleSubmit}>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
@@ -216,9 +221,9 @@ const SignIn: React.FC = () => {
                       onBlur={formik.handleBlur}
                       className="form-control w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
-                          {formik.errors.email && (
-                              <div className="text-danger">{formik.errors.email}</div>
-                            )}
+                    {formik.errors.email && (
+                      <div className="text-danger">{formik.errors.email}</div>
+                    )}
                     <span className="absolute right-4 top-4">
                       <svg
                         className="fill-current"
@@ -245,17 +250,17 @@ const SignIn: React.FC = () => {
                   </label>
                   <div className="relative">
                     <input
-                     type="password"
-                     name="password"
-                     value={formik.values.password}
-                     onChange={formik.handleChange}
-                     onBlur={formik.handleBlur}
-                     placeholder="6+ Characters, 1 Capital letter"
+                      type="password"
+                      name="password"
+                      value={formik.values.password}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      placeholder="6+ Characters, 1 Capital letter"
                       className="form-control w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
-                     {formik.errors.password && (
-                                                <div className="text-danger">{formik.errors.password}</div>
-                                              )}
+                    {formik.errors.password && (
+                      <div className="text-danger">{formik.errors.password}</div>
+                    )}
                     <span className="absolute right-4 top-4">
                       <svg
                         className="fill-current"
@@ -338,7 +343,7 @@ const SignIn: React.FC = () => {
           </div>
         </div>
       </div>
-  
+    </>
   );
 };
 
