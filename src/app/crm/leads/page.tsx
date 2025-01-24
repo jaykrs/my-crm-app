@@ -9,14 +9,13 @@ import { Package } from "@/types/package";
 import LeadModelView from "@/components/Model/LeadModelView";
 interface Lead {
   Source: string;
-  companyName: string;
   Status: string;
-  actions: string;
   AssignedTo: string;
+  Description: string;
   CompanyInformation: {
     CompanyName: string,
     Industry: string,
-    Revenue: Number
+    Revenue: string
   };
   ContactInformation: {
     Name: string,
@@ -24,20 +23,49 @@ interface Lead {
     Email: string,
     Address: string
   };
+  LeadID: string;
+  action:string;
+
 
   // openModal: () => void;
   // closeModal: () => void;
 
 }
+interface TablePageProps {
+  fetchleadsData: () => Promise<void>;
+}
 
-const TablesPage: React.FC<Lead> = () => {
+const TablesPage: React.FC<TablePageProps> = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [viewLead, setViewLead] = useState<Lead | null>(null);
+  // const [viewLead, setViewLead] = useState<Lead | null>(null);
+  const [viewLead, setViewLead] = useState<Lead>({
+    Source: "",
+    Status: "",
+    AssignedTo: "",
+    Description: "",
+    CompanyInformation: {
+      CompanyName: "",
+      Industry: "",
+      Revenue: "",
+    },
+    ContactInformation: {
+      Name: "",
+      Phone: "",
+      Email: "",
+      Address: "",
+    },
+    LeadID: "",
+    action:""
+  });
 
   useEffect(() => {
     fetchleadsData();
   }, []);
+
+  useEffect(() => {
+
+  }, [leads])
 
   const fetchleadsData = async () => {
     const token = localStorage.getItem("accessToken");
@@ -54,8 +82,33 @@ const TablesPage: React.FC<Lead> = () => {
     }
   };
 
+
   const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
+  const closeModal = () => {
+    setIsOpen(false);
+    setViewLead(prev => {
+      return {
+        ...prev,
+        ["Source"]: "",
+        ["Status"]: "",
+        ["AssignedTo"]: "",
+        ["Description"]: "",
+        ["CompanyInformation"]: {
+          ["CompanyName"]: "",
+          ["Industry"]: "",
+          ["Revenue"]: "",
+        },
+        ["ContactInformation"]: {
+          ["Name"]: "",
+          ["Phone"]: "",
+          ["Email"]: "",
+          ["Address"]: "",
+          ["LeadID"]:"",
+          ["action"]:""
+        }
+      }
+    })
+  };
   const handleView = (item?: any) => {
     setViewLead(item);
     setIsOpen(true);
@@ -68,6 +121,14 @@ const TablesPage: React.FC<Lead> = () => {
         {/* <TableData packageData={packageData} /> */}
 
         <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+          <div className="flex flex-row-reverse gap-2">
+            <button
+              className="flex justify-center rounded bg-primary px-6 py-2 font-medium text-gray hover:bg-opacity-90"
+              onClick={openModal}
+            >
+              New
+            </button>
+          </div>
           <div className="max-w-full overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
@@ -189,7 +250,7 @@ const TablesPage: React.FC<Lead> = () => {
               </tbody>
             </table>
 
-            <LeadModelView isOpen={isOpen} setIsOpen={setIsOpen} openModal={openModal} closeModal={closeModal} viewLead={viewLead} />
+            <LeadModelView isOpen={isOpen} setIsOpen={setIsOpen} openModal={openModal} closeModal={closeModal} viewLead={viewLead} setViewLead={setViewLead} fetchleadsData={fetchleadsData} />
           </div>
         </div>
       </div>
