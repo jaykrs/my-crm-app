@@ -27,9 +27,6 @@ interface Lead {
   action:string;
 
 
-  // openModal: () => void;
-  // closeModal: () => void;
-
 }
 interface TablePageProps {
   fetchleadsData: () => Promise<void>;
@@ -102,15 +99,16 @@ const TablesPage: React.FC<TablePageProps> = () => {
           ["Name"]: "",
           ["Phone"]: "",
           ["Email"]: "",
-          ["Address"]: "",
-          ["LeadID"]:"",
+          ["Address"]: ""
+        },
+        ["LeadID"]:"",
           ["action"]:""
-        }
       }
     })
   };
   const handleView = (item?: any) => {
     setViewLead(item);
+    
     setIsOpen(true);
   }
   return (

@@ -63,18 +63,13 @@ export async function PUT(req) {
       if (!LeadID) {
         return NextResponse.json({ message: "LeadID not provided!" }, { status: 400 });
       }
-      // Verify the token
       let token = req.headers.get("authorization");
       if (!token) {
         return NextResponse.json({ message: "Token not found!" }, { status: 401 });
       }
       token = token.split(" ")[1];
       config.verifyToken(token, config.secret);
-
-      // Parse the request body
       const body = await req.json();
-
-      // Update the lead
       const updatedLead = await Lead.findOneAndUpdate(
         { LeadID },
         {
@@ -93,7 +88,7 @@ export async function PUT(req) {
           Status: body.Status,
           AssignedTo: body.AssignedTo,
         },
-        { new: true } // Return the updated document
+        { new: true }
       );
 
       if (!updatedLead) {
