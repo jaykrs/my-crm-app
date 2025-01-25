@@ -24,7 +24,7 @@ interface Lead {
     Address: string
   };
   LeadID: string;
-  action:string;
+  action: string;
 
 
 }
@@ -53,7 +53,7 @@ const TablesPage: React.FC<TablePageProps> = () => {
       Address: "",
     },
     LeadID: "",
-    action:""
+    action: ""
   });
 
   useEffect(() => {
@@ -101,15 +101,33 @@ const TablesPage: React.FC<TablePageProps> = () => {
           ["Email"]: "",
           ["Address"]: ""
         },
-        ["LeadID"]:"",
-          ["action"]:""
+        ["LeadID"]: "",
+        ["action"]: ""
       }
     })
   };
   const handleView = (item?: any) => {
     setViewLead(item);
-    
+
     setIsOpen(true);
+  }
+
+  const handleDelete = (item?: any) => {
+    if (confirm("Are sure you want to Delete Record?")) {
+      axios.delete("/api/lead?LeadID=" + item.LeadID,
+        { headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") } })
+        .then(res => {
+          console.log("delete res",res);
+          if (res.status === 200) {
+            alert(res.data.message);
+            fetchleadsData();
+          } else {
+            alert(res.data.message);
+          }
+        }).catch(err => {
+          console.log(err.message);
+        })
+    }
   }
   return (
     <DefaultLayout>
@@ -194,7 +212,7 @@ const TablesPage: React.FC<TablePageProps> = () => {
                               />
                             </svg>
                           </button>
-                          <button className="hover:text-primary">
+                          <button className="hover:text-primary" onClick={() => handleDelete(item)}>
                             <svg
                               className="fill-current"
                               width="18"
@@ -221,7 +239,7 @@ const TablesPage: React.FC<TablePageProps> = () => {
                               />
                             </svg>
                           </button>
-                          <button className="hover:text-primary">
+                          {/* <button className="hover:text-primary">
                             <svg
                               className="fill-current"
                               width="18"
@@ -239,7 +257,7 @@ const TablesPage: React.FC<TablePageProps> = () => {
                                 fill=""
                               />
                             </svg>
-                          </button>
+                          </button> */}
                         </div>
                       </td>
                     </tr>
