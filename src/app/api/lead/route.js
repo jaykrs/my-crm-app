@@ -57,8 +57,39 @@ export async function POST(req) {
 export async function PUT(req) {
   const url = new URL(req.url);
   const LeadID = url.searchParams.get("LeadID");
+  if (req.method === 'PUT' && req.assign) {
+    try {
+      if (!LeadID) {
+        return NextResponse.json({ message: "LeadID not provided!" }, { status: 400 });
+      }
+      let token = req.headers.get("authorization");
+      if (!token) {
+        return NextResponse.json({ message: "Token not found!" }, { status: 401 });
+      }
+      token = token.split(" ")[1];
+      config.verifyToken(token, config.secret);
+      const body = await req.json();
+      const updatedLead = await Lead.findOneAndUpdate(
+        { LeadID },
+        {
+          AssignedTo: body.AssignedTo,
+        },
+        { new: true }
+      );
 
-  if (req.method === 'PUT') {
+      if (!updatedLead) {
+        return NextResponse.json({ message: "Lead not found!" }, { status: 404 });
+      }
+
+      return NextResponse.json(
+        { success: true, message: "Lead assigned successfully!", data: updatedLead },
+        { status: 200 }
+      );
+    } catch (error) {
+      console.error('Error updating lead:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }else if (req.method === 'PUT') {
     try {
       if (!LeadID) {
         return NextResponse.json({ message: "LeadID not provided!" }, { status: 400 });
@@ -176,7 +207,7 @@ export async function DELETE(req) {
       }
 
       return NextResponse.json(
-        { success: true, message: "Lead deleted successfully!" },
+        { success: true, message: "Record deleted successfully!" },
         { status: 200 }
       );
     } catch (error) {

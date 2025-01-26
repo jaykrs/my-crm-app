@@ -52,7 +52,6 @@ const leadSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// Avoid overwriting the model if it already exists
 const Lead = mongoose.models.Lead || mongoose.model('Lead', leadSchema);
 
 export default Lead;

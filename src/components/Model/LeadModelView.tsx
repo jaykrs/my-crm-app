@@ -29,8 +29,9 @@ interface LeadModelView {
     viewLead: Lead;
     setViewLead: React.Dispatch<React.SetStateAction<Lead>>;
     fetchleadsData: () => Promise<void>;
+    handleAssign : (id?: any, action?: any)=> Promise<void>;
 }
-const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, closeModal, viewLead, setViewLead, fetchleadsData }) => {
+const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, closeModal, viewLead, setViewLead, fetchleadsData,handleAssign }) => {
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -127,15 +128,6 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                 >
                                                                     Source
                                                                 </label>
-                                                                {/* <input
-                                                                    className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                                                                    type="text"
-                                                                    name="Source"
-                                                                    id="Source"
-                                                                    onChange={handleChange}
-                                                                    placeholder=""
-                                                                    defaultValue={viewLead.Source}
-                                                                /> */}
                                                                 <select id="dropdown" value={viewLead.Source} onChange={
                                                                     (e: React.ChangeEvent<HTMLSelectElement>) => {
                                                                         setViewLead({
@@ -175,7 +167,10 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                 >
                                                                     AssignTo
                                                                 </label>
-                                                                <input
+                                                                <button onClick={()=>{
+                                                                    viewLead.AssignedTo === localStorage.getItem("username")? handleAssign(viewLead.LeadID,"remove") : handleAssign(viewLead.LeadID,"assign")
+                                                                }}>{viewLead.AssignedTo === localStorage.getItem("username")? "Remove": "Assign"}</button>
+                                                                {/* <input
                                                                     className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                                                                     type="text"
                                                                     name="AssignTo"
@@ -183,7 +178,19 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                     onChange={handleChange}
                                                                     placeholder=""
                                                                     defaultValue={viewLead.AssignedTo}
-                                                                />
+                                                                /> */}
+                                                                {/* <select id="dropdown" value={viewLead.AssignedTo} onChange={
+                                                                    (e: React.ChangeEvent<HTMLSelectElement>) => {
+                                                                        setViewLead({
+                                                                            ...viewLead,
+                                                                            AssignedTo: e.target.value
+                                                                        })
+                                                                    }
+                                                                }>
+                                                                    <option value="">Select a source</option>
+                                                                    <option value="Website">Website</option>
+                                                                    <option value="admin">Admin</option>
+                                                                </select> */}
                                                             </div>
                                                         </div>
                                                         <label
