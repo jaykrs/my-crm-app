@@ -196,7 +196,7 @@ const TablesPage: React.FC<TablePageProps> = () => {
                       </td>
                       <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                         <p className="text-black dark:text-white">
-                          {item.CompanyInformation.CompanyName}
+                          {item.CompanyInformation?.CompanyName}
                         </p>
                       </td>
                       <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">

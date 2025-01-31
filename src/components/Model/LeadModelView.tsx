@@ -223,7 +223,7 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                     })}
                                                                     id="Name"
                                                                     placeholder=''
-                                                                    defaultValue={viewLead.ContactInformation.Name}
+                                                                    defaultValue={viewLead.ContactInformation?.Name}
                                                                 />
                                                             </div>
                                                             <div className="w-full sm:w-1/4">
@@ -248,7 +248,7 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                         })
                                                                     })}
                                                                     placeholder=""
-                                                                    defaultValue={viewLead.ContactInformation.Phone}
+                                                                    defaultValue={viewLead.ContactInformation?.Phone}
                                                                 />
                                                             </div>
                                                             <div className="w-full sm:w-1/4">
@@ -273,7 +273,7 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                         })
                                                                     })}
                                                                     placeholder=""
-                                                                    defaultValue={viewLead.ContactInformation.Email}
+                                                                    defaultValue={viewLead.ContactInformation?.Email}
                                                                 />
                                                             </div>
                                                             <div className="w-full sm:w-1/4">
@@ -298,7 +298,7 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                         })
                                                                     })}
                                                                     placeholder=""
-                                                                    defaultValue={viewLead.ContactInformation.Address}
+                                                                    defaultValue={viewLead.ContactInformation?.Address}
                                                                 />
                                                             </div>
                                                         </div>
@@ -332,7 +332,7 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                         })
                                                                     })}
                                                                     placeholder=""
-                                                                    defaultValue={viewLead.CompanyInformation.CompanyName}
+                                                                    defaultValue={viewLead.CompanyInformation?.CompanyName}
                                                                 />
                                                             </div>
                                                             <div className="w-full sm:w-1/3">
@@ -357,7 +357,7 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                         })
                                                                     })}
                                                                     placeholder=""
-                                                                    defaultValue={viewLead.CompanyInformation.Industry}
+                                                                    defaultValue={viewLead.CompanyInformation?.Industry}
                                                                 />
                                                             </div>
                                                             <div className="w-full sm:w-1/3">
@@ -382,7 +382,7 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                         })
                                                                     })}
                                                                     placeholder=""
-                                                                    defaultValue={viewLead.CompanyInformation.Revenue}
+                                                                    defaultValue={viewLead.CompanyInformation?.Revenue}
                                                                 />
                                                             </div>
 
