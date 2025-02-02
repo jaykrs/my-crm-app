@@ -57,7 +57,8 @@ export async function POST(req) {
 export async function PUT(req) {
   const url = new URL(req.url);
   const LeadID = url.searchParams.get("LeadID");
-  if (req.method === 'PUT' && req.assign) {
+  const body = await req.json();
+  if (req.method === 'PUT' && body.assign) {
     try {
       if (!LeadID) {
         return NextResponse.json({ message: "LeadID not provided!" }, { status: 400 });
@@ -68,7 +69,7 @@ export async function PUT(req) {
       }
       token = token.split(" ")[1];
       config.verifyToken(token, config.secret);
-      const body = await req.json();
+      //const body = await req.json();
       const updatedLead = await Lead.findOneAndUpdate(
         { LeadID },
         {
@@ -100,7 +101,7 @@ export async function PUT(req) {
       }
       token = token.split(" ")[1];
       config.verifyToken(token, config.secret);
-      const body = await req.json();
+      //const body = await req.json();
       const updatedLead = await Lead.findOneAndUpdate(
         { LeadID },
         {

@@ -1,60 +1,60 @@
-import React from 'react';
-import { toast } from 'react-toastify';
+import React from "react";
+import { toast } from "react-toastify";
 
-interface ToastComponentProp{
-    message: String
+interface toastProp{
+  Type: 'success' | 'warn' | 'error' | 'ValidationError';
+  Message: string;
+  Func: ()=> void;
 }
-
-
-const ToastComponent: React.FC <ToastComponentProp> = ({message}) => {
-  const handleClick = () => {
-    toast.success(message, {
-        position: "top-right",
-        autoClose: 5000, // milliseconds
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'colored', // or 'light', 'dark'
-      });
-    toast.error(message, {
-        position: "top-right",
-        autoClose: 5000, // milliseconds
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'colored', // or 'light', 'dark'
-      });
-    toast.info(message, {
-        position: "top-right",
-        autoClose: 5000, // milliseconds
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'colored', // or 'light', 'dark'
-      });
-    toast.warning(message, {
-        position: "top-right",
-        autoClose: 5000, // milliseconds
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'colored', // or 'light', 'dark'
-      });
-  };
-
-  return (
-    <div>
-      <button onClick={handleClick}>Show Toast</button>
-    </div>
-  );
+const toastComponent: React.FC<toastProp> = ({Type, Message, Func}) => {
+  if (Type === "success") {
+    return toast.success(Message, {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      onClose: Func,
+    });
+  }
+  if (Type === "warn") {
+    return toast.warn(Message, {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      onClose: Func,
+    });
+  }
+  if (Type === "error") {
+    return toast.error(Message, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      onClose: Func,
+    });
+    }
+    if (Type === "ValidationError") {
+        return toast.error(Message, {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+            onClose: Func,
+        });
+    }
 };
 
-export default ToastComponent;
+export default toastComponent;

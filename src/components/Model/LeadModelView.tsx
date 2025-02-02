@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Image from "next/image";
 import axios from 'axios';
+import toastComponent from '../ToastComponent';
 interface Lead {
     Source: string;
     Status: string;
@@ -29,10 +30,9 @@ interface LeadModelView {
     viewLead: Lead;
     setViewLead: React.Dispatch<React.SetStateAction<Lead>>;
     fetchleadsData: () => Promise<void>;
-    handleAssign : (id?: any, action?: any)=> Promise<void>;
+    handleAssign: (id?: any, action?: any) => Promise<void>;
 }
-const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, closeModal, viewLead, setViewLead, fetchleadsData,handleAssign }) => {
-
+const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, closeModal, viewLead, setViewLead, fetchleadsData, handleAssign }) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -41,8 +41,6 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
             [name]: value,
         }));
     }
-
-
     const handleUpdateLead = (e: React.FormEvent) => {
         e.preventDefault();
         if (viewLead !== null && viewLead.LeadID !== "") {
@@ -65,16 +63,16 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
             }, { headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") } })
                 .then(res => {
                     if (res.status === 200) {
-                        alert(res.data.message);
+                        toastComponent({ Type: "success", Message: res.data.message, Func: () => { } })
                         closeModal();
                         fetchleadsData();
                     } else {
-                        alert(res.data.message);
+                        toastComponent({ Type: "success", Message: res.data.message, Func: () => { } })
                     }
                 }).catch(err => {
-                    console.log(err.message);
+                    toastComponent({ Type: "error", Message: err.message, Func: () => { } });
                 })
-        }else{
+        } else {
             axios.post("/api/lead", {
                 Source: viewLead.Source,
                 Status: viewLead.Status,
@@ -94,16 +92,23 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
             }, { headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") } })
                 .then(res => {
                     if (res.status === 201) {
-                        alert(res.data.message);
+                        toastComponent({ Type: "success", Message: res.data.message, Func: () => { } })
                         closeModal();
                         fetchleadsData();
                     } else {
-                        alert(res.data.message);
+                        toastComponent({ Type: "success", Message: res.data.message, Func: () => { } })
                     }
                 }).catch(err => {
-                    console.log(err.message);
+                    toastComponent({ Type: "success", Message: err.message, Func: () => { } });
                 })
         }
+    }
+    const handleState = (name?: any , value ?: any)=>{
+        setViewLead(prev=>{
+            return {
+                ...prev, [name]: value
+            }
+        })
     }
     return (
         <>
@@ -160,38 +165,36 @@ const LeadModelView: React.FC<LeadModelView> = ({ isOpen, setIsOpen, openModal, 
                                                                     defaultValue={viewLead.Status}
                                                                 />
                                                             </div>
-                                                            <div className="w-full sm:w-1/3">
-                                                                <label
-                                                                    className="mb-3 block text-sm font-medium text-black dark:text-white"
-                                                                    htmlFor="AssignTo"
-                                                                >
-                                                                    AssignTo
-                                                                </label>
-                                                                <button onClick={()=>{
-                                                                    viewLead.AssignedTo === localStorage.getItem("username")? handleAssign(viewLead.LeadID,"remove") : handleAssign(viewLead.LeadID,"assign")
-                                                                }}>{viewLead.AssignedTo === localStorage.getItem("username")? "Remove": "Assign"}</button>
-                                                                {/* <input
-                                                                    className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                                                                    type="text"
-                                                                    name="AssignTo"
-                                                                    id="AssignTo"
-                                                                    onChange={handleChange}
-                                                                    placeholder=""
-                                                                    defaultValue={viewLead.AssignedTo}
-                                                                /> */}
-                                                                {/* <select id="dropdown" value={viewLead.AssignedTo} onChange={
-                                                                    (e: React.ChangeEvent<HTMLSelectElement>) => {
-                                                                        setViewLead({
-                                                                            ...viewLead,
-                                                                            AssignedTo: e.target.value
-                                                                        })
-                                                                    }
-                                                                }>
-                                                                    <option value="">Select a source</option>
-                                                                    <option value="Website">Website</option>
-                                                                    <option value="admin">Admin</option>
-                                                                </select> */}
-                                                            </div>
+                                                            {
+                                                                viewLead.LeadID !== "" ?
+
+                                                                <div className="w-full sm:w-1/3">
+                                                                    <label
+                                                                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                                        htmlFor="AssignTo"
+                                                                    >
+                                                                        AssignTo
+                                                                    </label>
+                                                                    <button onClick={() => {
+                                                                        viewLead.AssignedTo === localStorage.getItem("username") ? handleAssign(viewLead.LeadID, "remove") : handleAssign(viewLead.LeadID, "assign")
+                                                                    }}>{viewLead.AssignedTo === localStorage.getItem("username") ? "Remove" : "Assign"}</button>
+                                                                    
+                                                                </div>
+                                                                :
+                                                                ""
+                                                                // <div className="w-full sm:w-1/3">
+                                                                //     <label
+                                                                //         className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                                //         htmlFor="AssignTo"
+                                                                //     >
+                                                                //         AssignTo
+                                                                //     </label>
+                                                                //     <button onClick={() => {
+                                                                //         viewLead.AssignedTo === localStorage.getItem("username") ? handleState("AssignTo", "" ) : handleState("AssignTo", localStorage.getItem("username") )
+                                                                //     }}>{viewLead.AssignedTo === localStorage.getItem("username") ? "Remove" : "Assign"}</button>
+                                                                    
+                                                                // </div>
+                                                            }
                                                         </div>
                                                         <label
                                                             className="mb-3 block text-sm font-medium text-black dark:text-white"

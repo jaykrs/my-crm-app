@@ -7,6 +7,10 @@ import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { Package } from "@/types/package";
 import LeadModelView from "@/components/Model/LeadModelView";
+import { useRouter } from "next/navigation";
+import { ToastContainer } from "react-toastify";
+import toastComponent from "@/components/ToastComponent";
+
 interface Lead {
   Source: string;
   Status: string;
@@ -36,7 +40,10 @@ interface TablePageProps {
 const TablesPage: React.FC<TablePageProps> = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  // const [viewLead, setViewLead] = useState<Lead | null>(null);
+  const router = useRouter();
+  const HandleRouter = (path? : any)=>{
+      router.push(path);
+  }
   const [viewLead, setViewLead] = useState<Lead>({
     Source: "",
     Status: "",
@@ -65,6 +72,8 @@ const TablesPage: React.FC<TablePageProps> = () => {
 
   }, [leads])
 
+  
+
   const fetchleadsData = async () => {
     const token = localStorage.getItem("accessToken");
     try {
@@ -72,11 +81,15 @@ const TablesPage: React.FC<TablePageProps> = () => {
         .get("/api/lead", { headers: { Authorization: "Bearer " + token } })
         .then((result) => {
           if (result && result.request.status === 200) {
-            setLeads(result.data.data);
+            if(result.data.data.length === 0){
+              toastComponent({Type:"warn", Message:"Data not found", Func:()=> {}})
+            }else{
+              setLeads(result.data.data);
+            }
           }
         });
     } catch (e) {
-      console.log(e);
+      toastComponent({Type:"error", Message:"Something went wrong!", Func:()=> {}})
     }
   };
 
@@ -109,7 +122,6 @@ const TablesPage: React.FC<TablePageProps> = () => {
   };
   const handleView = (item?: any) => {
     setViewLead(item);
-
     setIsOpen(true);
   }
 
@@ -118,20 +130,21 @@ const TablesPage: React.FC<TablePageProps> = () => {
       await axios.delete("/api/lead?LeadID=" + item.LeadID,
         { headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") } })
         .then(res => {
-          console.log("delete res", res);
           if (res.status === 200) {
-            alert(res.data.message);
+            toastComponent({Type:"success", Message:res.data.message, Func:()=> {}})
             fetchleadsData();
           } else {
-            alert(res.data.message);
+            toastComponent({Type:"warn", Message:res.data.message, Func:()=> {}})
           }
         }).catch(err => {
           console.log(err.message);
+          toastComponent({Type:"error", Message:err.message, Func:()=> {}})
         })
     }
   }
 
   const handleAssign = async (id?: any, action?: any) => {
+    console.log("id: " + id + " action: " + action);
     if (confirm("Are you sure you want assign your self?")) {
       await axios.put("/api/lead?LeadID=" + id, {
         AssignedTo: action === "assign" ? localStorage.getItem("username") : "admin",
@@ -139,19 +152,20 @@ const TablesPage: React.FC<TablePageProps> = () => {
       }, { headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") } })
         .then(res => {
           if (res.status === 200) {
-            alert(res.data.message);
             closeModal();
+            toastComponent({Type:"success", Message:res.data.message, Func:()=> {}})
             fetchleadsData();
           } else {
-            alert(res.data.message);
+            toastComponent({Type:"warn", Message:res.data.message, Func:()=> {}})
           }
         }).catch(err => {
-          console.log(err.message);
+          toastComponent({Type:"error", Message:err.message, Func:()=> {}})
         })
     }
-  }
+  } 
   return (
     <DefaultLayout>
+      <ToastContainer />
       <Breadcrumb pageName="Tables" />
 
       <div className="flex flex-col gap-10">
@@ -187,7 +201,7 @@ const TablesPage: React.FC<TablePageProps> = () => {
               <tbody>
                 {leads.length > 0
                   ? leads.map((item, key) => (
-                    (item.AssignedTo === localStorage.getItem("username") || item.AssignedTo === "admin") &&
+                    (item.AssignedTo === localStorage.getItem("username") || item.AssignedTo === "admin" || item.AssignedTo === "")  &&
                     (<tr key={key}>
                       <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
                         <h5 className="font-medium text-black dark:text-white">

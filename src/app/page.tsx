@@ -12,7 +12,11 @@ import { useRouter } from 'next/navigation'
 import { ToastContainer } from 'react-toastify';
 import ToastComponent from "@/components/ToastComponent";
 const SignIn: React.FC = () => {
+
   const router = useRouter()
+  const handleRouting = ()=>{
+    router.push('/profile')
+  }
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -27,8 +31,8 @@ const SignIn: React.FC = () => {
               localStorage.setItem("accessToken", result.data.data.accessToken)
               localStorage.setItem('username', result.data.data.email);
               localStorage.setItem('loginStatus', 'true');
-              ToastComponent(result.data.data.message);
-              router.push('/profile')
+              ToastComponent({Type:'success',Message:result.data.data.message,Func:handleRouting}); 
+              
             } else {
               ToastComponent(result.data.message);
             }
