@@ -17,6 +17,7 @@
     "bcryptjs": "^2.4.3",
     "flatpickr": "^4.6.13",
     "formik": "^2.4.6",
+    "grapesjs": "^0.22.5",
     "jsonwebtoken": "^9.0.2",
     "jsvectormap": "^1.6.0",
     "mongoose": "^7.4.0",
