@@ -1,68 +1,46 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import TableData from "@/components/Tables/TableData";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import { Package } from "@/types/package";
-import LeadModelView from "@/components/Model/LeadModelView";
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 import toastComponent from "@/components/ToastComponent";
+import RecipientView from "@/components/Model/RecipientView";
 
-interface Lead {
-  Source: string;
-  Status: string;
-  AssignedTo: string;
-  Description: string;
-  CompanyInformation: {
-    CompanyName: string,
-    Industry: string,
-    Revenue: string
-  };
-  ContactInformation: {
-    Name: string,
-    Phone: string,
-    Email: string,
-    Address: string
-  };
-  LeadID: string;
-  action: string;
-
-
+interface RecipientProp {
+    recipientID:string,
+    name: string,
+    email: string,
+    phone: string,
+    category: string,
+    city: string,
+    tag: string,
+    additionalData: string
 }
 interface TablePageProps {
   fetchleadsData: () => Promise<void>;
   handleAssign: (id?: any, action?: any) => Promise<void>;
+
 }
 
-const TablesPage: React.FC<TablePageProps> = () => {
-  const [leads, setLeads] = useState<Lead[]>([]);
+const Recipient: React.FC<TablePageProps> = () => {
+  const [RecipientOb, setRecipientOb] = useState<RecipientProp[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
+   const [RecipientViewState, setRecipientViewState] = useState<RecipientProp>({
+    recipientID:"",
+    name: "",
+    email: "",
+    phone: "",
+    category: "",
+    city: "",
+    tag: "",
+    additionalData: ""
+    });
   const HandleRouter = (path? : any)=>{
       router.push(path);
   }
-  const [viewLead, setViewLead] = useState<Lead>({
-    Source: "",
-    Status: "",
-    AssignedTo: "",
-    Description: "",
-    CompanyInformation: {
-      CompanyName: "",
-      Industry: "",
-      Revenue: "",
-    },
-    ContactInformation: {
-      Name: "",
-      Phone: "",
-      Email: "",
-      Address: "",
-    },
-    LeadID: "",
-    action: ""
-  });
 
   useEffect(() => {
     fetchleadsData();
@@ -70,21 +48,18 @@ const TablesPage: React.FC<TablePageProps> = () => {
 
   useEffect(() => {
 
-  }, [leads])
-
-  
-
+  }, [RecipientOb])
   const fetchleadsData = async () => {
     const token = localStorage.getItem("accessToken");
     try {
       await axios
-        .get("/api/lead", { headers: { Authorization: "Bearer " + token } })
+        .get("/api/recipient", { headers: { Authorization: "Bearer " + token } })
         .then((result) => {
           if (result && result.request.status === 200) {
             if(result.data.data.length === 0){
               toastComponent({Type:"warn", Message:"Data not found", Func:()=> {}})
             }else{
-              setLeads(result.data.data);
+              setRecipientOb(result.data.data);
             }
           }
         });
@@ -92,42 +67,31 @@ const TablesPage: React.FC<TablePageProps> = () => {
       toastComponent({Type:"error", Message:"Something went wrong!", Func:()=> {}})
     }
   };
-
-
   const openModal = () => setIsOpen(true);
   const closeModal = () => {
     setIsOpen(false);
-    setViewLead(prev => {
+    setRecipientViewState(prev => {
       return {
         ...prev,
-        ["Source"]: "",
-        ["Status"]: "",
-        ["AssignedTo"]: "",
-        ["Description"]: "",
-        ["CompanyInformation"]: {
-          ["CompanyName"]: "",
-          ["Industry"]: "",
-          ["Revenue"]: "",
-        },
-        ["ContactInformation"]: {
-          ["Name"]: "",
-          ["Phone"]: "",
-          ["Email"]: "",
-          ["Address"]: ""
-        },
-        ["LeadID"]: "",
-        ["action"]: ""
+        ["recipientID"] : "",
+        ["name"]: "",
+        ["email"]: "",
+        ["phone"]: "",
+        ["category"]: "",
+        ["city"]: "",
+        ["tag"]: "",
+        ["additionalData"]:""
       }
     })
   };
   const handleView = (item?: any) => {
-    setViewLead(item);
+    setRecipientViewState(item);
     setIsOpen(true);
   }
 
   const handleDelete = async (item?: any) => {
     if (confirm("Are sure you want to Delete Record?")) {
-      await axios.delete("/api/lead?LeadID=" + item.LeadID,
+      await axios.delete("/api/recipient?id=" + item.recipientID,
         { headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") } })
         .then(res => {
           if (res.status === 200) {
@@ -142,26 +106,7 @@ const TablesPage: React.FC<TablePageProps> = () => {
         })
     }
   }
-
-  const handleAssign = async (id?: any, action?: any) => {
-    if (confirm("Are you sure you want assign your self?")) {
-      await axios.put("/api/lead?LeadID=" + id, {
-        AssignedTo: action === "assign" ? localStorage.getItem("username") : "admin",
-        assign: true
-      }, { headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") } })
-        .then(res => {
-          if (res.status === 200) {
-            closeModal();
-            toastComponent({Type:"success", Message:res.data.message, Func:()=> {}})
-            fetchleadsData();
-          } else {
-            toastComponent({Type:"warn", Message:res.data.message, Func:()=> {}})
-          }
-        }).catch(err => {
-          toastComponent({Type:"error", Message:err.message, Func:()=> {}})
-        })
-    }
-  } 
+  console.log("state", RecipientViewState);
   return (
     <DefaultLayout>
       <ToastContainer />
@@ -183,33 +128,35 @@ const TablesPage: React.FC<TablePageProps> = () => {
             <table className="w-full table-auto">
               <thead>
                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                  <th className="min-w-[30%] px-4 py-5 font-medium text-black dark:text-white xl:pl-11">
-                    Source
+                  <th className="min-w-[20%] px-4 py-5 font-medium text-black dark:text-white xl:pl-11">
+                    Name
                   </th>
                   <th className="min-w-[20%] px-4 py-5 font-medium text-black dark:text-white">
-                    Company Name
+                    Email
                   </th>
                   <th className="min-w-[20%] px-4 py-5 font-medium text-black dark:text-white">
-                    Status
+                    Category
                   </th>
-                  <th className=" min-w-[30%] px-4 py-5 font-medium text-black dark:text-white">
+                  <th className="min-w-[20%] px-4 py-5 font-medium text-black dark:text-white">
+                    tag
+                  </th>
+                  <th className=" min-w-[20%] px-4 py-5 font-medium text-black dark:text-white">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {leads.length > 0
-                  ? leads.map((item, key) => (
-                    (item.AssignedTo === localStorage.getItem("username") || item.AssignedTo === "admin" || item.AssignedTo === "")  &&
-                    (<tr key={key}>
+                {RecipientOb.length > 0
+                  ? RecipientOb.map((item, key) => (
+                    <tr key={key}>
                       <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
                         <h5 className="font-medium text-black dark:text-white">
-                          {item.Source}
+                          {item.name}
                         </h5>
                       </td>
                       <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                         <p className="text-black dark:text-white">
-                          {item.CompanyInformation?.CompanyName}
+                          {item.email}
                         </p>
                       </td>
                       <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
@@ -223,7 +170,21 @@ const TablesPage: React.FC<TablePageProps> = () => {
                             // : "bg-warning text-warning"
                             }`}
                         >
-                          {item.Status}
+                          {item.category}
+                        </p>
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <p
+                          className={`inline-flex rounded-full bg-opacity-10 px-3 py-1 text-sm font-medium ${
+                            // item.status === "Paid"
+                            //   ? 
+                            "bg-success text-success"
+                            // : item.status === "Unpaid"
+                            // ? "bg-danger text-danger"
+                            // : "bg-warning text-warning"
+                            }`}
+                        >
+                          {item.tag}
                         </p>
                       </td>
                       <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
@@ -274,20 +235,20 @@ const TablesPage: React.FC<TablePageProps> = () => {
                               />
                             </svg>
                           </button>
-                          <button className="hover:text-primary" onClick={() => handleAssign(item.LeadID, item.AssignedTo === localStorage.getItem("username") ? "remove" : "assign")} >
+                          {/* <button className="hover:text-primary" onClick={() => handleAssign(item.LeadID, item.AssignedTo === localStorage.getItem("username") ? "remove" : "assign")} >
                             {
                               item.AssignedTo === localStorage.getItem("username") ? "remove" : "assign"
                             }
-                          </button>
+                          </button> */}
                         </div>
                       </td>
-                    </tr>)
+                    </tr>
                   ))
                   : ""}
               </tbody>
             </table>
 
-            <LeadModelView isOpen={isOpen} setIsOpen={setIsOpen} openModal={openModal} closeModal={closeModal} viewLead={viewLead} setViewLead={setViewLead} fetchleadsData={fetchleadsData} handleAssign={handleAssign} />
+            <RecipientView isOpen={isOpen} setIsOpen={setIsOpen} openModal={openModal} closeModal={closeModal} RecipientViewState={RecipientViewState} setRecipientViewState={setRecipientViewState} fetchleadsData={fetchleadsData} />
           </div>
         </div>
       </div>
@@ -296,4 +257,4 @@ const TablesPage: React.FC<TablePageProps> = () => {
   );
 };
 
-export default TablesPage;
+export default Recipient;
