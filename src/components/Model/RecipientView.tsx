@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import Image from "next/image";
 import axios from 'axios';
 import toastComponent from '../ToastComponent';
+interface tagState {
+    tag: string
+}
 interface RecipientViewProps {
     recipientID: string,
     name: string,
@@ -20,8 +23,11 @@ interface RecipientView {
     RecipientViewState: RecipientViewProps;
     setRecipientViewState: React.Dispatch<React.SetStateAction<RecipientViewProps>>;
     fetchleadsData: () => Promise<void>;
+    tagLists: tagState[];
 }
-const RecipientView: React.FC<RecipientView> = ({ isOpen, setIsOpen, openModal, closeModal, RecipientViewState, setRecipientViewState, fetchleadsData }) => {
+const RecipientView: React.FC<RecipientView> = ({ isOpen, setIsOpen, openModal, closeModal, RecipientViewState, setRecipientViewState, fetchleadsData, tagLists }) => {
+
+    const [addNew, setAddNew] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -33,7 +39,9 @@ const RecipientView: React.FC<RecipientView> = ({ isOpen, setIsOpen, openModal, 
     const handleUpdateLead = (e: React.FormEvent) => {
         e.preventDefault();
         // let url = RecipientViewState.recipientID !== "" ? "/api/recipient?id=" + RecipientViewState.recipientID : "/api/recipient";
-        if (RecipientViewState !== null && RecipientViewState.recipientID !== "") {
+        if(RecipientViewState.tag === ""){
+            toastComponent({ Type: "error", Message: "Tag is mandatory, please select or add new tag! ", Func: () => { } })
+        }else if (RecipientViewState !== null && RecipientViewState.recipientID !== "") {
             axios.put("/api/recipient?id=" + RecipientViewState.recipientID, {
                 name: RecipientViewState.name,
                 email: RecipientViewState.email,
@@ -48,6 +56,7 @@ const RecipientView: React.FC<RecipientView> = ({ isOpen, setIsOpen, openModal, 
                         toastComponent({ Type: "success", Message: res.data.message, Func: () => { } })
                         closeModal();
                         fetchleadsData();
+                        setAddNew(false);
                     } else {
                         toastComponent({ Type: "success", Message: res.data.message, Func: () => { } })
                     }
@@ -69,6 +78,7 @@ const RecipientView: React.FC<RecipientView> = ({ isOpen, setIsOpen, openModal, 
                         toastComponent({ Type: "success", Message: res.data.message, Func: () => { } })
                         closeModal();
                         fetchleadsData();
+                        setAddNew(false);
                     } else {
                         toastComponent({ Type: "success", Message: res.data.message, Func: () => { } })
                     }
@@ -232,18 +242,44 @@ const RecipientView: React.FC<RecipientView> = ({ isOpen, setIsOpen, openModal, 
                                                                 </label>
                                                                 <select id="tag" value={RecipientViewState.tag} onChange={
                                                                     (e: React.ChangeEvent<HTMLSelectElement>) => {
-                                                                        setRecipientViewState({
-                                                                            ...RecipientViewState,
-                                                                            tag: e.target.value
-                                                                        })
+                                                                        if (e.target.value === 'addNewTag') {
+                                                                            setAddNew(true);
+                                                                        } else {
+                                                                            setRecipientViewState({
+                                                                                ...RecipientViewState,
+                                                                                tag: e.target.value
+                                                                            })
+                                                                        }
                                                                     }
                                                                 }>
-                                                                    <option value="">Select a Tag</option>
-                                                                    <option value="Travel">Travel</option>
+                                                                    <option value="" disabled >Select a Tag</option>
+                                                                    <option value="addNewTag">Add New</option>
+                                                                    {
+                                                                        tagLists.length > 0 ? tagLists.map((el, i) => {
+                                                                            return (
+                                                                                <option key={i} value={el.toString()}>{el.toString()}</option>
+                                                                            )
+                                                                        }) : ""
+                                                                    }
+
+                                                                    {/* <option value="Travel">Travel</option>
                                                                     <option value="Watching">Watching</option>
                                                                     <option value="Reading">Reading</option>
-                                                                    <option value="Other">Other</option>
+                                                                    <option value="addNewTag">Add New</option> */}
                                                                 </select>
+                                                                {
+                                                                    addNew &&
+                                                                    <input
+                                                                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                                        type="text"
+                                                                        name="tag"
+                                                                        id="tag"
+                                                                        onChange={handleChange}
+                                                                        placeholder=""
+                                                                        defaultValue={RecipientViewState.category}
+                                                                    />
+                                                                }
+
                                                             </div>
 
 
