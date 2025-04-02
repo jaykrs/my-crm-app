@@ -211,6 +211,7 @@ import axios from 'axios';
 import { ToastContainer } from 'react-toastify';
 import { headers } from 'next/headers';
 import toastComponent from '@/components/ToastComponent';
+import { useSearchParams } from 'next/navigation';
 
 interface temProps {
     temName: string;
@@ -223,8 +224,8 @@ const GrapesEditor: React.FC = () => {
     const [templateHtml, setTemplateHtml] = useState("");
     const [temCode, setTemCode] = useState<temProps[]>([]);
     const editorRef = useRef<Editor | null>(null);
+    const params = useSearchParams();
 
-    // Fetch the template list from the API
     const getTemplateList = async () => {
         const token = localStorage.getItem("accessToken");
         try {
@@ -237,7 +238,6 @@ const GrapesEditor: React.FC = () => {
         }
     };
 
-    // Initialize the GrapesJS editor
     useEffect(() => {
         editorRef.current = grapesjs.init({
             container: '#gjs',
@@ -284,7 +284,6 @@ const GrapesEditor: React.FC = () => {
         };
     }, []);
 
-    // Add blocks dynamically once temCode has been populated
     useEffect(() => {
         if (temCode.length > 0 && editorRef.current) {
             temCode.forEach((el) => {
@@ -304,9 +303,8 @@ const GrapesEditor: React.FC = () => {
                 }
             });
         }
-    }, [temCode]);  // This effect runs every time temCode changes
+    }, [temCode]);
 
-    // Extract HTML and CSS when the button is clicked
     const getTemplateHtml = async () => {
         if (editorRef.current) {
             const htmlContent = editorRef.current.getHtml();
@@ -342,15 +340,26 @@ const GrapesEditor: React.FC = () => {
                 }, {
                     headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") }
                 }).then(res => {
-                    toastComponent({Type:'success',Message:res.data.message,Func:()=>{}})
+                    toastComponent({ Type: 'success', Message: res.data.message, Func: () => { } })
                 })
-            }else{
-                toastComponent({Type:'success',Message:"Please add a template from block to save.",Func:()=>{}})
+            } else {
+                toastComponent({ Type: 'success', Message: "Please add a template from block to save.", Func: () => { } })
             }
         }
     };
 
-    // Fetch the template list when the component mounts
+    // const clearEditor = () => {
+    //     if (editorRef.current) {
+    //         editorRef.current.setHtml()
+    //     }
+    // };
+
+    const setHtmlContentInEditor = (html: string) => {
+        if (editorRef.current) {
+            editorRef.current.setComponents(html);
+        }
+    };
+
     useEffect(() => {
         getTemplateList();
     }, []);
@@ -358,9 +367,12 @@ const GrapesEditor: React.FC = () => {
     return (
         <DefaultLayout>
             <ToastContainer />
-            <div className="flex justify-between">
-                <button onClick={getTemplateHtml} className="bg-blue-500 text-white py-1 px-4 my-1 rounded ml-auto">
+            <div className="w-full flex justify-end  gap-2.5" >
+                <button onClick={getTemplateHtml} className="bg-blue-500 text-white py-1 px-4 my-1 rounded " >
                     Save
+                </button>
+                <button onClick={() => setHtmlContentInEditor('<body></body>')} className="bg-blue-500 text-white py-1 px-4 my-1 rounded " >
+                    Clear
                 </button>
             </div>
             <div>
