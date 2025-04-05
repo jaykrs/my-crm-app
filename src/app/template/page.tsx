@@ -201,9 +201,6 @@
 
 // export default GrapesEditor;
 
-
-'use client';
-
 import React, { useEffect, useState, useRef } from 'react';
 import grapesjs, { Editor } from 'grapesjs';
 import DefaultLayout from '@/components/Layouts/DefaultLayout';
@@ -212,6 +209,7 @@ import { ToastContainer } from 'react-toastify';
 import { headers } from 'next/headers';
 import toastComponent from '@/components/ToastComponent';
 import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 interface temProps {
     temName: string;
@@ -223,8 +221,11 @@ interface temProps {
 const GrapesEditor: React.FC = () => {
     const [templateHtml, setTemplateHtml] = useState("");
     const [temCode, setTemCode] = useState<temProps[]>([]);
+    const [tempParams, setTempParams] = useState<string | '<body></body>'>('<body></body>');
     const editorRef = useRef<Editor | null>(null);
     const params = useSearchParams();
+    const router = useRouter();
+
 
     const getTemplateList = async () => {
         const token = localStorage.getItem("accessToken");
@@ -239,6 +240,9 @@ const GrapesEditor: React.FC = () => {
     };
 
     useEffect(() => {
+        let temp = params.get('temp');
+        setTempParams(temp ? temp : '<body></body>');
+
         editorRef.current = grapesjs.init({
             container: '#gjs',
             height: '100vh',
@@ -285,6 +289,10 @@ const GrapesEditor: React.FC = () => {
     }, []);
 
     useEffect(() => {
+        setHtmlContentInEditor(tempParams);
+    }, [tempParams])
+
+    useEffect(() => {
         if (temCode.length > 0 && editorRef.current) {
             temCode.forEach((el) => {
                 // Only add blocks for the current user or admin
@@ -322,6 +330,7 @@ const GrapesEditor: React.FC = () => {
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <script src="https://cdn.tailwindcss.com"></script>
+                <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
                 <style>
                 ${cssContent}
                 </style>
@@ -356,6 +365,10 @@ const GrapesEditor: React.FC = () => {
 
     const setHtmlContentInEditor = (html: string) => {
         if (editorRef.current) {
+            html = html.replace(/<!DOCTYPE[^>]*>/i, '');
+            html = html.replace(/<html[^>]*>([\s\S]*?)<\/html>/, '$1');
+            html = html.replace(/<head[^>]*>[\s\S]*?<\/head>/, '')
+            html = html.replace(/\s+/g, ' ').trim();
             editorRef.current.setComponents(html);
         }
     };
