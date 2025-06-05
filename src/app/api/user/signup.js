@@ -16,7 +16,7 @@ export default async function handler(req, res, next) {
 
                    if (null == docs) {
                        Role.findOne({ name: 'guest' }).then( async (roleid) => {
-                           userRole = roleid.name;
+                           userRole = roleid.name; 
                            user = {
                                name: body.name,
                                email: body.email,
